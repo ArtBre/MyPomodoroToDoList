@@ -15,7 +15,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 
 public class MainPomListWindow {
 	private JFrame frame;
@@ -30,7 +34,9 @@ public class MainPomListWindow {
 	private JTextField repCycles;
 	private JLabel     repLabel;
 	private JTextField addToListField;
-	File fileManager=new File();
+	private File fileManager=new File();
+	
+	HashMap <String, MyPomodoroTask>  taskMap = new HashMap<String, MyPomodoroTask>();
     MyPomodoroTimer pomTimer;
 	/**
 	 * Launch the application.
@@ -82,7 +88,7 @@ public class MainPomListWindow {
 		workHours.setColumns(10);
 		
 		workMinutes = new JTextField();
-		workMinutes.setText("0");
+		workMinutes.setText("25");
 		workMinutes.setColumns(10);
 		workMinutes.setBounds(240, 108, 42, 20);
 		frame.getContentPane().add(workMinutes);
@@ -100,7 +106,7 @@ public class MainPomListWindow {
 		frame.getContentPane().add(breakHours);
 		
 		breakMinutes = new JTextField();
-		breakMinutes.setText("0");
+		breakMinutes.setText("5");
 		breakMinutes.setColumns(10);
 		breakMinutes.setBounds(240, 139, 42, 20);
 		frame.getContentPane().add(breakMinutes);
@@ -180,6 +186,26 @@ public class MainPomListWindow {
 		
 		DefaultListModel<String> listModel = new DefaultListModel<String>();
 		JList<String> toDoList = new JList<String>(listModel);
+		toDoList.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+			if(taskMap.containsKey(listModel.getElementAt(toDoList.getSelectedIndex()))){
+				MyPomodoroTask selTask = taskMap.get(listModel.getElementAt(toDoList.getSelectedIndex()));
+				 workHours.setText(Integer.toString(selTask.workHours));
+				 workMinutes.setText(Integer.toString(selTask.workMinutes));
+				 workSeconds.setText(Integer.toString(selTask.workSeconds));
+				 breakHours.setText(Integer.toString(selTask.breakHours));
+				 breakMinutes.setText(Integer.toString(selTask.breakMinutes));
+				 breakSeconds.setText(Integer.toString(selTask.breakSeconds));
+				 repCycles.setText(Integer.toString(selTask.rep));
+				
+			}
+				
+			
+			
+				
+			}
+		});
 		toDoList.setBorder(new LineBorder(new Color(0, 0, 0), 2));
 		toDoList.setBounds(188, 185, 383, 174);
 		frame.getContentPane().add(toDoList);
@@ -197,6 +223,7 @@ public class MainPomListWindow {
 					if(addToListField.getText().isEmpty()!=true)
 					{
 						listModel.addElement(addToListField.getText());
+						taskMap.put(addToListField.getText(),new MyPomodoroTask(Integer.parseInt(workHours.getText()),Integer.parseInt(workMinutes.getText()),Integer.parseInt(workSeconds.getText()),Integer.parseInt(breakHours.getText()),Integer.parseInt(breakMinutes.getText()),Integer.parseInt(breakSeconds.getText()),Integer.parseInt(repCycles.getText())));
 						addToListField.setText("");
 						try {
 							fileManager.updateTaskFile(listModel, Consts.Paths.listPath);
@@ -220,6 +247,7 @@ public class MainPomListWindow {
 				if(addToListField.getText().isEmpty()!=true)
 				{
 					listModel.addElement(addToListField.getText());
+					taskMap.put(addToListField.getText(),new MyPomodoroTask(Integer.parseInt(workHours.getText()),Integer.parseInt(workMinutes.getText()),Integer.parseInt(workSeconds.getText()),Integer.parseInt(breakHours.getText()),Integer.parseInt(breakMinutes.getText()),Integer.parseInt(breakSeconds.getText()),Integer.parseInt(repCycles.getText())));
 					addToListField.setText("");
 					try {
 						fileManager.updateTaskFile(listModel, Consts.Paths.listPath);
@@ -227,6 +255,9 @@ public class MainPomListWindow {
 						// TODO Auto-generated catch block
 						ex.printStackTrace();
 					}
+				
+				
+				
 				}
 			}
 		});
@@ -236,7 +267,9 @@ public class MainPomListWindow {
 		JButton remButton = new JButton("REM");
 		remButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			listModel.remove(toDoList.getSelectedIndex());
+			if(!listModel.isEmpty() && toDoList.isSelectedIndex(toDoList.getSelectedIndex()))listModel.remove(toDoList.getSelectedIndex());
+			
+			
 			try {
 				fileManager.updateTaskFile(listModel, Consts.Paths.listPath);
 			} catch (IOException ex) {
@@ -251,11 +284,17 @@ public class MainPomListWindow {
 		JButton swapButton = new JButton("SWAP");
 		swapButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				List<String> valueList =toDoList.getSelectedValuesList();
-				int[] indexList =toDoList.getSelectedIndices();
+				try{
+					List<String> valueList =toDoList.getSelectedValuesList();
+					int[] indexList =toDoList.getSelectedIndices();
+					
+					listModel.setElementAt(valueList.get(1), indexList[0]);
+					listModel.setElementAt(valueList.get(0), indexList[1]);
+				}
+				catch(Exception ex) {
+					
+				}	
 				
-				listModel.setElementAt(valueList.get(1), indexList[0]);
-				listModel.setElementAt(valueList.get(0), indexList[1]);
 				try {
 					fileManager.updateTaskFile(listModel, Consts.Paths.listPath);
 				} catch (IOException ex) {

@@ -7,16 +7,16 @@ import javax.swing.JLabel;
 
 public class MyPomodoroTimer {
 
-MyPomodoroTask myActualTask;
+private MyPomodoroTask myActualTask;
+private Duration duration;
+private JLabel myActualLabel;
+private Timer timer=new Timer();
+private TimerTask counterTask;
+private int tempRep=1;
+private boolean toSwitchWorkBreak=false;
+private String mode=Consts.Writings.work;
 
-Duration duration;
-
-JLabel myActualLabel;
-Timer timer=new Timer();
-TimerTask counterTask;
-int tempRep=1;
-boolean toSwitchWorkBreak=false;
-String mode=Consts.Writings.work;
+//--------------------------------------------------------------------------
 
 public MyPomodoroTimer(MyPomodoroTask actualTask,JLabel actualLabel)
 {
@@ -25,7 +25,7 @@ this.myActualLabel=actualLabel;
 this.duration=this.myActualTask.getWorkDur();
 }
 
-void bodyRun(){
+private void bodyRun(){
 	 
 	 duration=duration.minus(Duration.ofSeconds(1));
 	 
@@ -82,8 +82,7 @@ void bodyRun(){
        }
 }
 
-
-void timerInitStart(){
+public void timerInitStart(){
 	duration=duration.plus(Duration.ofSeconds(1));
 	
 	counterTask= new TimerTask(){
@@ -98,8 +97,7 @@ void timerInitStart(){
     
 }
 
-
-void start(){
+public void start(){
 	
 	counterTask= new TimerTask(){
 		public void run()
@@ -111,15 +109,13 @@ void start(){
 	timer.scheduleAtFixedRate(counterTask,500,1000);
 }
 
-void pause(){
+public void pause(){
 	timer.cancel(); 
 	timer.purge();
 	timer=new Timer();
 }
 
-
-
-void timerReset(){
+public void timerReset(){
 	myActualLabel.setText(Consts.Writings.end);
 	timer.cancel();
 	timer.purge();

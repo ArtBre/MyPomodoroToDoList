@@ -96,7 +96,7 @@ return true;
 else return false;
 }
 
-void saveToFile(String value,String filename) throws IOException 
+private void saveToFile(String value,String filename) throws IOException 
 {
 if(isFileEmpty(filename)) value="\n"+value;
 
@@ -109,7 +109,7 @@ bw.write(value);
 bw.close();
 }
 
-void clearFile(String patch) throws FileNotFoundException{
+private void clearFile(String patch) throws FileNotFoundException{
 PrintWriter writer = new PrintWriter(patch);
 writer.print("");
 writer.close();
